@@ -1,13 +1,14 @@
 // Data
 // var notesData = require("../db/<db.json>");
+const fs = require("fs");
 
 module.exports = function (app) {
 
     const notesArr = [
         {
-            title: "Test Title",
-            text: "Test Note",
-            id: 0
+            title: "Lame Test Title",
+            text: "Test Note, also lame",
+            id: "0"
         }
     ]
 
@@ -18,11 +19,19 @@ module.exports = function (app) {
 
     // POST: when user adds to the Notes list
     app.post("/api/notes", function (request, response) {
-        // make a new note
+        // make a new note from incoming request.body data
         const data = request.body;
-        console.log(data);
+        
+        // use timestamp to create an id for the new note
+        const newNote = {
+            title: data.title,
+            text: data.text,
+            id: Date.now().toString()
+        }
+        
+        // add new Note to the list
+        notesArr.push(newNote);
 
-        // add it to the list
         // return the updated list 
         return response.json(notesArr);
     });
