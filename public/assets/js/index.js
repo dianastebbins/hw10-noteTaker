@@ -1,16 +1,3 @@
-// Dependencies
-const express = require("express");
-const path = require("path");
-
-// Setup the Express App
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Setup Express App to handle data parsing
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(express.static("public"));
-
 // pre-defined pointers to elements
 var $noteTitle = $(".note-title");
 var $noteText = $(".note-textarea");
@@ -155,8 +142,3 @@ $noteText.on("keyup", handleRenderSaveBtn);
 
 // Gets and renders the initial list of notes
 getAndRenderNotes();
-
-// Start the server to begin listening
-app.listen(PORT, function () {
-  console.log(`Note Taker is listening on PORT ${PORT}`);
-});
