@@ -1,33 +1,54 @@
-// Data
-// var notesData = require("../db/<db.json>");
+// Data read and write
 const fs = require("fs");
 
 module.exports = function (app) {
 
     // an array to hold all the saved data locally
     const notesArr = [];
-
+    
     // GET: 
     app.get("/api/notes", function (request, response) {
         // retrieve list from memory and return fresh list to the page
         retrieveNotes();
         return response.json(notesArr);
     });
-
+    
     // POST: adds new Note to the list
     app.post("/api/notes", function (request, response) {
-        // create/save new Note and return the updated list to the page
-        saveNewNote(request.body);
-        return response.json(notesArr);
+        // create/save new Note and return it to the page
+        const newNote = saveNewNote(request.body);
+        return response.json(newNote);
     });
-
+    
     // DELETE: deletes a Note from the list
     app.delete("/api/notes/:id", function (request, response) {
         // delete Note designated by incoming id and return the updated list to the page
         deleteNote(request.params.id);
         return response.json(notesArr);
     });
+    
+    // get the data out of the "db"
+    function retrieveNotes() {
+        fs.readFile("./db/db.json", "utf8", function (error, savedData) {
+            if (error) {
+                return console.log(error);
+            }
 
+            // for every element in db.json, create a note object and save it to notesArr
+            notesArr.length = 0;
+            let tempArr = JSON.parse(savedData);
+            tempArr.forEach(element => {
+                const newNote = {
+                    title: element.title,
+                    text: element.text,
+                    id: element.id
+                }
+                notesArr.push(newNote);
+            });
+        });
+    }
+
+    // prepares a new note to be added to the "db"
     function saveNewNote(data) {
         // use timestamp to create an id for the new note
         const newNote = {
@@ -38,8 +59,11 @@ module.exports = function (app) {
         notesArr.push(newNote);
         console.log(`Added note id ${newNote.id}`);
         persist();
+
+        return newNote;
     }
 
+    // removes a user selected note from the "db"
     function deleteNote(idToDelete) {
         // find the existing note with the incoming note id
         const indexToDelete = findNoteById(idToDelete);
@@ -52,6 +76,7 @@ module.exports = function (app) {
         }
     }
 
+    // helper function to find note's position in array
     function findNoteById(idToFind) {
         for (let index = 0; index < notesArr.length; index++) {
             const element = notesArr[index];
@@ -63,26 +88,7 @@ module.exports = function (app) {
         return -1;
     }
 
-    function retrieveNotes() {
-        fs.readFile("./db/db.json", "utf8", function (error, data) {
-            if (error) {
-                return console.log(error);
-            }
-
-            // for every element in db.json, create a note object and save it to notesArr
-            notesArr.length = 0;
-            let tempArr = JSON.parse(data);
-            tempArr.forEach(element => {
-                const newNote = {
-                    title: element.title,
-                    text: element.text,
-                    id: element.id
-                }
-                notesArr.push(newNote);
-            });
-        });
-    }
-
+    // writes to "db", in this case a json file
     function persist() {
         fs.writeFile("./db/db.json", JSON.stringify(notesArr), function (err) {
             if (err) {
