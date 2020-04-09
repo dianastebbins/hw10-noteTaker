@@ -23,7 +23,7 @@ An application that allows the user to read, create and delete notes.
 ```
 Uses npm express and is deployed via Heroku
 ```
-[Deployed application](coming soon)
+[Deployed application](#https://safe-harbor-08124.herokuapp.com)
 
 ### Usage
 ```
